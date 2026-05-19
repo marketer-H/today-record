@@ -44,6 +44,8 @@
     auth.onAuthStateChanged(async user => {
       if (user) {
         currentUser = user;
+        const btn = document.getElementById('startBtn');
+        if (btn) { btn.disabled = false; btn.textContent = '시작하기'; }
         try {
           const userDoc = await db.collection('users').doc(user.uid).get();
           if (userDoc.exists) {
@@ -56,7 +58,10 @@
           showSetup();
         }
       } else {
-        auth.signInAnonymously().catch(() => showSetup());
+        auth.signInAnonymously().catch(() => {
+          const btn = document.getElementById('startBtn');
+          if (btn) { btn.disabled = false; btn.textContent = '시작하기'; }
+        });
       }
     });
 
@@ -278,7 +283,8 @@
       transition: background 0.15s;
     }
 
-    .setup-btn:hover { background: #444; }
+    .setup-btn:hover:not(:disabled) { background: #444; }
+    .setup-btn:disabled { background: #ccc; cursor: default; }
 
     /* ── Main Screen ──────────────────────────── */
     #main {
@@ -521,7 +527,7 @@
   <p class="setup-sub">엑스보다 동그라미를 더 많이 외친 하루를<br>기록해요. 뭐라고 불러드릴까요?</p>
   <div class="setup-input-wrap">
     <input id="nicknameInput" type="text" placeholder="닉네임 입력" maxlength="12" onkeydown="nicknameKeydown(event)" autofocus>
-    <button class="setup-btn" onclick="submitNickname()">시작하기</button>
+    <button class="setup-btn" id="startBtn" onclick="submitNickname()" disabled>준비 중…</button>
   </div>
 </div>
 
